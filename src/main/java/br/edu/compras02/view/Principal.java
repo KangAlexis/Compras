@@ -4,17 +4,27 @@
  */
 package br.edu.compras02.view;
 
+import br.edu.compras02.model.Cliente;
+import br.edu.compras02.util.InicializarComponentes;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author User
  */
 public class Principal extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Principal
-     */
+    private final String NOME_CLIENTE = "Insira o nome";
+    private ArrayList<Cliente> listaDeClientes =  new ArrayList<>();
+    
     public Principal() {
         initComponents();
+        configuraCampos();
+        setLocationRelativeTo(this);
     }
 
     /**
@@ -181,6 +191,11 @@ public class Principal extends javax.swing.JFrame {
         );
 
         btnSalvarCliente.setText("Salvar");
+        btnSalvarCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalvarClienteActionPerformed(evt);
+            }
+        });
 
         btnLimparClientes.setText("Limpar");
 
@@ -352,6 +367,13 @@ public class Principal extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnPesquisarClienteActionPerformed
 
+    private void btnSalvarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarClienteActionPerformed
+        Cliente c = retornaCliente();
+        listaDeClientes.add(c);
+        atualizaTabela(tblListaDeClientes, listaDeClientes);
+        System.out.println(listaDeClientes.toString());
+    }//GEN-LAST:event_btnSalvarClienteActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -416,4 +438,56 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JTextField txtNomeCliente;
     private javax.swing.JTextField txtPesquisarCliente;
     // End of variables declaration//GEN-END:variables
+
+    private void configuraCampos(){
+        InicializarComponentes ic = new InicializarComponentes();
+        ic.configuraTextField(txtNomeCliente, NOME_CLIENTE);
+    }
+    
+    private Cliente retornaCliente(){
+        
+        String nomeCompleto = txtNomeCliente.getText();
+        String telefone = ftdTelefoneCliente.getText();
+        String cpf = ftdCpfCliente.getText();
+        
+        String sexo;
+        if(rdbMasculinoCliente.isSelected()){
+            sexo = "Masculino";
+        }else if(rdbFemininoCliente.isSelected()){
+            sexo = "Feminino";
+        }else{
+            sexo = "Indefinido";
+        }
+        
+        String data = ftdDataNascimentoCliente.getText();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate dataNascimento = LocalDate.parse(data, dtf);
+        
+        Cliente c = new Cliente();
+        c.setNome(nomeCompleto);
+        c.setTelefone(telefone);
+        c.setCpf(cpf);
+        c.setSexo(sexo);
+        c.setDataDeNascimento(dataNascimento);
+        
+        return c;
+    }
+    
+    private void atualizaTabela(JTable tabela, ArrayList<Cliente> listaDeClientes){
+        DefaultTableModel modeloTabela = (DefaultTableModel) tabela.getModel();
+        
+        modeloTabela.setNumRows(0);
+        
+        for(Cliente c : listaDeClientes){
+            Object[] linha = {c.getNome(), 
+                              c.getTelefone(),
+                              c.getDataDeNascimento(),
+                              c.getCpf(), 
+                              c.getSexo()
+                            };
+            modeloTabela.addRow(linha);
+            
+        }
+    }
+
 }
